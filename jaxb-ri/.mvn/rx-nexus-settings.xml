@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	RxLogix Nexus: configured from the environment so no credentials live in the repo
+	(same NEXUS_* variables as the other RxLogix forks).
+
+	Pass it as *global* settings so ~/.m2/settings.xml (mirrors, servers) still applies.
+	Build first, then deploy:
+
+	cd jaxb-ri && mvn -gs .mvn/rx-nexus-settings.xml clean install
+	mvn -gs .mvn/rx-nexus-settings.xml deploy -DskipTests
+
+	The rx-javadoc profile (jaxb-ri/pom.xml, activated below) attaches the -javadoc.jar that
+	upstream's Central release has; the tools/osgi_tests modules skip deploy, as upstream.
+	Do not use the EE4J parent's oss-release profile: it also injects central-publishing-maven-plugin,
+	which replaces the deploy step with a Sonatype Central upload.
+
+	Releases (4.0.9-rxlogix-N) go to NEXUS_URL; -SNAPSHOT versions follow
+	the project's own snapshot repository unless overridden on the command line.
+-->
+<settings>
+	<servers>
+		<server>
+			<id>rx-nexus</id>
+			<username>${env.NEXUS_USERNAME}</username>
+			<password>${env.NEXUS_PASSWORD}</password>
+		</server>
+	</servers>
+	<profiles>
+		<profile>
+			<id>rx-nexus</id>
+			<properties>
+				<!-- id::layout::url form is understood by every maven-deploy-plugin version
+					(2.x only knows altDeploymentRepository; 3.x prefers altReleaseDeploymentRepository) -->
+				<altDeploymentRepository>rx-nexus::default::${env.NEXUS_URL}</altDeploymentRepository>
+				<altReleaseDeploymentRepository>rx-nexus::default::${env.NEXUS_URL}</altReleaseDeploymentRepository>
+			</properties>
+		</profile>
+	</profiles>
+	<activeProfiles>
+		<activeProfile>rx-nexus</activeProfile>
+		<activeProfile>rx-javadoc</activeProfile>
+	</activeProfiles>
+</settings>

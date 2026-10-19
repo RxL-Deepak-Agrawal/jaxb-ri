@@ -606,6 +606,28 @@
     </modules>
 
     <profiles>
+        <!-- RxLogix: attach the -javadoc.jar like the EE4J parent's oss-release profile, which can't be
+             used for rx-nexus because it also injects central-publishing-maven-plugin (Sonatype upload)
+             and GPG signing. Activated by .mvn/rx-nexus-settings.xml. -->
+        <profile>
+            <id>rx-javadoc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>default-profile</id>
             <activation>
